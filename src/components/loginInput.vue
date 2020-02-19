@@ -39,8 +39,8 @@ Vue.use(Toast)
 export default {
   data () {
     return {
-      username: '',
-      password: ''
+      username: 'le123',
+      password: '123456'
     }
   },
   methods: {
@@ -59,7 +59,12 @@ export default {
       // 判断登录成功给出提示
       if (res.data.message !== '登录成功') {
         Toast(res.data.message)
+        return false
       } else {
+        // 登录成功后存储token值
+        localStorage.setItem('loginToken', res.data.data.token)
+        localStorage.setItem('userId', res.data.data.user.id)
+        this.$router.push({ name: 'Mycenter', params: { id: res.data.data.user.id } })
         Toast('登录成功')
       }
     }
