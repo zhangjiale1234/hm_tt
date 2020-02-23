@@ -34,3 +34,23 @@ export const updataUserInfo = (id, data) => {
     data
   })
 }
+// 栏目列表
+export const getCategoryList = (params) => {
+  return axios({
+    url: '/category',
+    params
+  })
+}
+// 获取文章数据
+export const getPostsList = (params) => {
+  return axios({
+    url: '/post',
+    params
+  })
+}
+// 获取文章详情
+export const getPostData = (id) => {
+  return axios({
+    url: `/post/${id}`
+  })
+}

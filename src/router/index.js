@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Index from '../views/index'
 import Login from '../pages/login.vue'
 import Register from '../pages/register.vue'
 import Mycenter from '../pages/mycenter.vue'
 import EditUserInfo from '../pages/editUserInfo.vue'
+import Index from '../pages/index'
+import ArticleDetail from '@/pages/articleDetail.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -13,11 +14,13 @@ const routes = [
     name: 'Index',
     component: Index
   },
+
   {
     path: '/login',
     name: 'Login',
     component: Login
-  }, {
+  },
+  {
     path: '/register',
     name: 'Register',
     component: Register
@@ -31,6 +34,11 @@ const routes = [
     path: '/editUserInfo',
     name: 'EditUserInfo',
     component: EditUserInfo
+  },
+  {
+    path: '/articleDetail/:id',
+    name: 'ArticleDetail',
+    component: ArticleDetail
   }
 ]
 
