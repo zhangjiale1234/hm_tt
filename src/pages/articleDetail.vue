@@ -5,44 +5,114 @@
         <van-icon name="arrow-left back" @click="$router.back()" />
         <span class="iconfont iconnew new"></span>
       </div>
-      <span>关注</span>
+      <span :class="artical.has_follow?'active':''" @click="headleFollow">{{artical.has_follow?'已关注':'关注'}}</span>
     </div>
-    <div class="detail" v-html="articleContent">
-
+     <div class="detail">
+      <div class="title">{{artical.title}}</div>
+      <div class="desc">
+        <span>{{artical.user.nickname}}</span> &nbsp;&nbsp;
+        <span>2019-9-9</span>
+      </div>
+      <div id="content" class="articalcontent" v-html="artical.content"></div>
+      <div class="video" v-if='artical.type === 2'>
+        <video src="https://video.pearvideo.com/mp4/adshort/20191018/cont-1613484-14496802_adpkg-ad_hd.mp4" controls :poster='artical.cover[0].url'></video>
+      </div>
+      <div class="opt">
+        <span :class="{like:true,active:artical.has_like}" @click="headleHasLike">
+          <van-icon name="good-job-o" />
+          {{artical.like_length}}
+        </span>
+        <span class="chat">
+          <van-icon name="chat" class="w" />微信
+        </span>
+      </div>
+    </div>
+    <!-- 精彩跟帖 -->
+    <div class="keeps" v-if="artical.comment_length > 0">
+      <h2>精彩跟帖</h2>
+      <div class="item">
+        <div class="head">
+          <img src="https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1582521845&di=ecb92524ce3aa7b880a9c36a0007b24a&src=http://a2.att.hudong.com/08/72/01300000165476121273722687045.jpg" alt />
+          <div>
+            <p>火星网友</p>
+            <span>2小时前</span>
+          </div>
+          <span>回复</span>
+        </div>
+        <div class="text">文章说得很有道理</div>
+      </div>
+      <div class="more">更多跟帖</div>
+    </div>
+    <div style="height:50px;width:100%"></div>
+    <div class="bottom">
+      <comment></comment>
     </div>
   </div>
 </template>
 
 <script>
-import { getPostData } from '@/api/myapi.js'
+import { getPostData, clickLike, followUser } from '@/api/myapi.js'
+import comment from '@/components/comment.vue'
+import { Toast } from 'vant'
 export default {
+  components: {
+    comment
+  },
   data () {
     return {
-      articleContent: ''
+      // 文章详情信息
+      artical: '',
+      currentId: '',
+      // 关注用户的id
+      userId: ''
     }
   },
   mounted () {
     console.log(this.$route)
     const id = this.$route.params.id
+    this.currentId = id
+    // 获取文章的列表信息
     getPostData(id)
       .then(res => {
+        this.artical = res.data.data
         console.log(res)
-        this.articleContent = res.data.data.content
+        // 用户id存起来
+        this.userId = res.data.data.user.id
       })
+  },
+  methods: {
+    async headleHasLike () {
+      const id = this.$route.params.id
+      // 文章点赞
+      const res = await clickLike(id)
+      console.log(res)
+      if (res.data.message === '点赞成功') {
+        Toast(res.data.message)
+        // 重新刷新页面数据
+        getPostData(id)
+          .then(res => {
+            this.artical = res.data.data
+          })
+      }
+    },
+    async headleFollow () {
+      const res = await followUser(this.userId)
+      console.log(res)
+    }
   }
 }
 </script>
 
-<style scoped lang="less">
-
-.articledetail{
+<style lang='less' scoped>
+.articledetail {
   .video {
     width: 100%;
     video {
       width: 100%;
     }
   }
-.header {
+  // 如果想要修改服务器返回页面结构中的元素的样式，则不要添加scoped标识，否则无法修改元素的样式
+  .header {
     padding: 0px 10px;
     box-sizing: border-box;
     height: 50px;
@@ -180,5 +250,11 @@ export default {
       font-size: 13px;
     }
   }
+}
+.bottom{
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #fff;
 }
 </style>

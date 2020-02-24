@@ -54,3 +54,15 @@ export const getPostData = (id) => {
     url: `/post/${id}`
   })
 }
+// 点赞
+export const clickLike = (id) => {
+  return axios({
+    url: `/post_like/${id}`
+  })
+}
+// 关注用户
+export const followUser = (id) => {
+  return axios({
+    url: `/user_follows/${id}`
+  })
+}
