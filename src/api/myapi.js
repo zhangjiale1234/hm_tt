@@ -66,3 +66,17 @@ export const followUser = (id) => {
     url: `/user_follows/${id}`
   })
 }
+// 发送评论
+export const sentComment = (data, id) => {
+  return axios({
+    method: 'post',
+    url: `/post_comment/${id}`,
+    data
+  })
+}
+// 获取评论列表
+export const getCommentList = (id) => {
+  return axios({
+    url: `/post_comment/${id}`
+  })
+}

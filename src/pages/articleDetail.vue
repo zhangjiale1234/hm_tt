@@ -30,33 +30,35 @@
     <!-- 精彩跟帖 -->
     <div class="keeps" v-if="artical.comment_length > 0">
       <h2>精彩跟帖</h2>
-      <div class="item">
+      <div class="item" v-for="(item,index) in commentList" :key="index" >
+      <commentItem :comment='item' @sendcomment="sendcomment(comment)" v-if="item.parent"></commentItem>
         <div class="head">
           <img src="https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1582521845&di=ecb92524ce3aa7b880a9c36a0007b24a&src=http://a2.att.hudong.com/08/72/01300000165476121273722687045.jpg" alt />
           <div>
-            <p>火星网友</p>
+            <p>{{item.user.nickname}}</p>
             <span>2小时前</span>
           </div>
           <span>回复</span>
         </div>
-        <div class="text">文章说得很有道理</div>
+        <div class="text">{{item.content}}</div>
       </div>
       <div class="more">更多跟帖</div>
     </div>
     <div style="height:50px;width:100%"></div>
     <div class="bottom">
-      <comment></comment>
+      <commentfoot :posts="artical"></commentfoot>
     </div>
   </div>
 </template>
 
 <script>
-import { getPostData, clickLike, followUser } from '@/api/myapi.js'
-import comment from '@/components/comment.vue'
+import { getPostData, clickLike, followUser, getCommentList } from '@/api/myapi.js'
+import commentfoot from '@/components/commentfoot.vue'
+import commentItem from '@/components/commentItem.vue'
 import { Toast } from 'vant'
 export default {
   components: {
-    comment
+    commentfoot, commentItem
   },
   data () {
     return {
@@ -64,20 +66,26 @@ export default {
       artical: '',
       currentId: '',
       // 关注用户的id
-      userId: ''
+      userId: '',
+      // 评论列表
+      commentList: ''
     }
   },
   mounted () {
-    console.log(this.$route)
     const id = this.$route.params.id
     this.currentId = id
     // 获取文章的列表信息
     getPostData(id)
       .then(res => {
         this.artical = res.data.data
-        console.log(res)
+        console.log(this.artical)
         // 用户id存起来
         this.userId = res.data.data.user.id
+      })
+    getCommentList(id)
+      .then(res1 => {
+        this.commentList = res1.data.data
+        console.log(this.commentList)
       })
   },
   methods: {
@@ -95,9 +103,13 @@ export default {
           })
       }
     },
+    // 关注
     async headleFollow () {
       const res = await followUser(this.userId)
       console.log(res)
+    },
+    sendcomment (comment) {
+      console.log(comment)
     }
   }
 }
